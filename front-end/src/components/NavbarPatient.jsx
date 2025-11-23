@@ -8,10 +8,22 @@ export const NavbarPatient = () => {
             <div className='flex items-center justify-between'>
                 <h1 className='text-3xl font-bold text-primary font-sans tracking-tight'>DrugTwin</h1>
                 <div className='flex items-center gap-4'>
-                  <Link to="/QR" className='btn btn-black btn-outline px-4'>
+                  <div className='btn btn-primary btn-outline' onClick={()=>document.getElementById('my_modal_4').showModal()}>
                     <QrCode className='size-5'/>
                     <span>QR scan</span> 
-                  </Link>
+                  </div>
+                  <dialog id="my_modal_4" className="modal">
+                    <div className="modal-box size-96 max-w-5xl justify-center items-center text-center flex flex-col">
+                      <h3 className="font-bold text-lg">QR Code</h3>
+                      <QrCode className='size-96'/>
+                      <div className="modal-action">
+                        <form method="dialog">
+                          {/* if there is a button, it will close the modal */}
+                          <button className="btn">Close</button>
+                        </form>
+                      </div>
+                    </div>
+                  </dialog>
                   <div>
                     <div className="dropdown dropdown-end">
                       <div tabIndex={0} role="button" className="btn btn-ghost">
