@@ -1,11 +1,11 @@
 import NavbarPatient from '../components/NavbarPatient.jsx'
-import DashboardPatientCarrousel from '../components/DashboardPatientCarrousel.jsx'
+import ComplianceCard from '../components/ComplianceCard.jsx'
 
 const PatientPage = () => {
   return (
     <div>
       <NavbarPatient />
-      <DashboardPatientCarrousel />
+      <ComplianceCard />
     </div>
   )
 }

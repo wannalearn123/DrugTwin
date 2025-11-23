@@ -8,7 +8,7 @@ export const NavbarPatient = () => {
             <div className='flex items-center justify-between'>
                 <h1 className='text-3xl font-bold text-primary font-sans tracking-tight'>DrugTwin</h1>
                 <div className='flex items-center gap-4'>
-                  <div className='btn btn-primary btn-outline' onClick={()=>document.getElementById('my_modal_4').showModal()}>
+                  <div className='btn btn-black btn-outline' onClick={()=>document.getElementById('my_modal_4').showModal()}>
                     <QrCode className='size-5'/>
                     <span>QR scan</span> 
                   </div>
@@ -26,16 +26,17 @@ export const NavbarPatient = () => {
                   </dialog>
                   <div>
                     <div className="dropdown dropdown-end">
-                      <div tabIndex={0} role="button" className="btn btn-ghost">
+                      <div tabIndex={0} role="button" className="btn btn-ghost flex gap-2  ">
                         <div className="avatar mr-2">
                           <div className="w-12 rounded-full">
                             <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
                           </div>
                         </div>
-                        <div className='flex flex-col items-start gap-2'>
+                        <div className='flex flex-col items-start gap-2 mx-2'>
                         <span className='text text-base'><strong>Username</strong></span>
                         <span className='text text-base/50'>UserID</span>
                         </div>
+                        <span className='text text-primary'><strong>Patient</strong></span>
                         <ChevronDown className='size-5 ml-2'/>
                       </div>
                       <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
