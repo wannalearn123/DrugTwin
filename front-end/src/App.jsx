@@ -6,6 +6,7 @@ import PharmacistPage from './pages/PharmacistPage'
 import PatientPage from './pages/PatientPage'
 import AdminPage from './pages/AdminPage'
 import RolePage from './pages/RolePage'
+import QR from './pages/QR.jsx'
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/patient" element={<PatientPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/role" element={<RolePage />} />
+        <Route path="/QR" element={<QR />} />
       </Routes>
     </div>
   )

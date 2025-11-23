@@ -1,10 +1,10 @@
-import Navbar from '../components/Navbar.jsx'
+import NavbarHome from '../components/NavbarHome.jsx'
 import CTA_Session from '../components/CTA_Session.jsx'
 
 const HomePage = () => {
   return (
     <div className='min-h-screen'>
-      <Navbar />
+      <NavbarHome />
       <CTA_Session />
     </div>
   )
