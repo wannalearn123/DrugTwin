@@ -10,8 +10,8 @@ const ComplianceCard = () => {
                 <p className='text text-base/50'>30 Hari Terakhir</p>
                 <progress className="progress progress-primary w-56" value="85" max="100"></progress>
                 <div className='flex justify-between w-full px-8'>
-                  <p>Obat diminum tepat waktu</p>
-                  <p>25/30 hari</p>
+                  <p className="text text-left">Obat diminum tepat waktu</p>
+                  <p className="text text-right text-primary">25/30 hari</p>
                 </div>
               </div>
             </form>

@@ -1,17 +1,21 @@
 import ComplianceCard from '../components/ComplianceCard.jsx'
 import ActiveDrug from './ActiveDrug.jsx'
+import AiAsk from './AiAsk.jsx'
+import ScheduleTherapy from './ScheduleTherapy.jsx'
+import FastAction from './FastAction.jsx'
 
 const DashboardPatient = () => {
   return (
     <div>
-      <div className="hero bg-base-200 min-h-[70vh]">
-        <div className="hero-content flex-col lg:flex-row-reverse">
-          <div className="text-center lg:text-left">
-            <h3 className="text-lg font-bold">Patient Dashboard</h3>
-            <p className="py-6">
-              Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
-              quasi. In deleniti eaque aut repudiandae et a id nisi.
-            </p>
+      <div className="mx-auto max-w-6xl p-4">
+        <div className="flex flex-row-reverse gap-12 justify-center ">
+          <div className='flex flex-col gap-6'>
+            <FastAction />
+            <AiAsk />
+          </div>
+          <div className="flex flex-col gap-6">
+            <ScheduleTherapy />
+
           </div>
           <div className='flex flex-col gap-6'>
               <ComplianceCard />

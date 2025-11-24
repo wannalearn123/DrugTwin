@@ -14,7 +14,7 @@ const ActiveDrug = () => {
     <div>
         <div className="card bg-base-100 w-96 shadow-xl">
             <div className="card-body">
-                <h3 className="card-title text-md">Obat Aktif</h3>
+                <h3 className="card-title text-md mb-2">Obat Aktif</h3>
                 <Drug drugName="Paracetamol - 10mg" frequency="3 times a day" />
                 <Drug drugName="Amoxicillin - 500mg" frequency="2 times a day" />
                 <Drug drugName="Ibuprofen - 200mg" frequency="as needed" />
