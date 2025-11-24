@@ -6,8 +6,9 @@ import FastAction from './FastAction.jsx'
 
 const DashboardPatient = () => {
   return (
-    <div>
+    <div className="bg-base-100 min-h-screen ">
       <div className="mx-auto max-w-6xl p-4">
+        <h2 className="text-xl font-semibold mb-4">Dashboard Pasien</h2>
         <div className="flex flex-row-reverse gap-12 justify-center ">
           <div className='flex flex-col gap-6'>
             <FastAction />
