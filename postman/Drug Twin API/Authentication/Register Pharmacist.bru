@@ -1,0 +1,30 @@
+meta {
+  name: Register Pharmacist
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/auth/register
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Alex Johnson",
+    "email": "pharmacist@example.com",
+    "password": "password123",
+    "role": "pharmacist",
+    "licenseNumber": "PHAR123456",
+    "phoneNumber": "+1234567890"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
