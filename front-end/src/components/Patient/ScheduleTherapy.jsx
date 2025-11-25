@@ -39,7 +39,7 @@ const ScheduleTherapy = () => {
           <h2 className="card-title">Jadwal Terapi</h2>
           <Therapy time="08:00" name="Amoxylin" total="3 obat" badge="primary" cond="Sudah" /> 
           <Therapy time="12:00" name="Pharacetamol" total="2 obat" badge="primary" cond="Sudah" />
-          <Therapy time="18:00" name="Ibupsrofen" total="4 obat" badge="error" cond="Tidak" />
+          <Therapy time="18:00" name="Ibuprofen" total="4 obat" badge="error" cond="Tidak" />
         </div>
       </div>
   )
