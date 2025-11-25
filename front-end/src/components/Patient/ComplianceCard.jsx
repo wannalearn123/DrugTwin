@@ -4,7 +4,7 @@ const ComplianceCard = () => {
     <div>
         <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-xl">
             <form className="card-body">
-              <h3 className='text text-lg mb-6'>Tingkat Kepatuhan</h3>
+              <h3 className='text text-lg mb-6 font-bold'>Tingkat Kepatuhan</h3>
               <div className='items-center text-center flex flex-col gap-4'>
                 <h1 className='text text-primary text-4xl font-bold'>85%</h1>
                 <p className='text text-base/50'>30 Hari Terakhir</p>
