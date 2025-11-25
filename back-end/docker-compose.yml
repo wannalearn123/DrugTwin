@@ -1,0 +1,51 @@
+# // filepath: docker-compose.yml
+services:
+  mongo:
+    image: mongo:7
+    container_name: drugtwin_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: drugtwin_admin
+      MONGO_INITDB_ROOT_PASSWORD: drugtwin_pass_2024
+    volumes:
+      - mongo_storage:/data/db
+    networks:
+      - app_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: drugtwin_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_storage:/data
+    networks:
+      - app_network
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: drugtwin_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: drugtwin_user
+      RABBITMQ_DEFAULT_PASS: drugtwin_rabbit_2024
+    volumes:
+      - rabbitmq_storage:/var/lib/rabbitmq
+    networks:
+      - app_network
+
+volumes:
+  mongo_storage:
+  redis_storage:
+  rabbitmq_storage:
+
+networks:
+  app_network:
+    driver: bridge

@@ -1,0 +1,26 @@
+meta {
+  name: Login
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/api/auth/login
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "patient@example.com",
+    "password": "password123"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
