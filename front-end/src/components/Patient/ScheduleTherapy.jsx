@@ -9,13 +9,15 @@ const ScheduleTherapy = () => {
           <input type="checkbox" />
           <div className="collapse-title font-medium">
             <div className='flex justify-between items-center gap-4'>
-              <div className='flex flex-col items-center gap-2'>
-                <Clock className={`size-5 text-${badge}`} />
-                <p className='text text-md'>{time}</p>
+              <div className='flex flex-row gap-8'>
+                <div className='flex flex-col items-center gap-2'>
+                  <Clock className={`size-5 text-${badge}`} />
+                  <p className='text text-md'>{time}</p>
+                </div>
+                <div className=''>
+                  <h3 className='text text-md font-bold'>{name}</h3>
+                  <p className='text text-base/50'>{total}</p>
               </div>
-              <div className=''>
-                <h3 className='text text-md font-bold'>{name}</h3>
-                <p className='text text-base/50'>{total}</p>
               </div>
               <div>
                 <div className={`badge badge-${badge} badge-xl`}><span>{cond} Diminum</span></div>
@@ -32,16 +34,14 @@ const ScheduleTherapy = () => {
   }
 
   return (
-    <div className="text-left w-max">
-      <div className="card bg-base-100 w-max shadow-xl">
-        <div className="card-body w-max [additional styles here]">
+      <div className="card bg-base-100 w-max shadow-xl flex flex-row overflow-x-auto ">
+        <div className="card-body w-max">
           <h2 className="card-title">Jadwal Terapi</h2>
           <Therapy time="08:00" name="Amoxylin" total="3 obat" badge="primary" cond="Sudah" /> 
           <Therapy time="12:00" name="Pharacetamol" total="2 obat" badge="primary" cond="Sudah" />
           <Therapy time="18:00" name="Ibuprofen" total="4 obat" badge="error" cond="Tidak" />
         </div>
       </div>
-    </div>
   )
 }
 
