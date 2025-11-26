@@ -1,0 +1,31 @@
+meta {
+  name: Create Patient
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/admin/patient
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "userId": "USER_ID_HERE",
+    "name": "John Doe",
+    "dateOfBirth": "1990-01-15",
+    "phone": "+1234567890",
+    "bloodType": "O+",
+    "allergies": ["Penicillin"],
+    "emergencyContact": {
+      "name": "Jane Doe",
+      "relationship": "Spouse",
+      "phone": "+0987654321"
+    }
+  }
+}

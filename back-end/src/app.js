@@ -6,6 +6,8 @@ import logger from './utils/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+
 const app = express();
 
 // Connect to database
@@ -33,8 +35,9 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 
-// 404 handler - Changed from '*' to catch-all middleware
+// 404 handler
 app.use((req, res, next) => {
   res.status(404).json({
     status: 'error',

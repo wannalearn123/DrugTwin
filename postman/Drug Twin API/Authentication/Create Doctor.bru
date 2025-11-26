@@ -1,0 +1,32 @@
+meta {
+  name: Create Doctor
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/admin/doctor
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "userId": "USER_ID_HERE",
+    "licenseNumber": "DOC123456",
+    "specialties": ["Cardiology", "Internal Medicine"],
+    "qualifications": [
+      {
+        "degree": "MD",
+        "institution": "Harvard Medical School",
+        "year": 2010
+      }
+    ],
+    "experienceYears": 13,
+    "consultationFee": 150
+  }
+}
