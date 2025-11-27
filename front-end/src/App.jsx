@@ -1,27 +1,53 @@
-import React from 'react'
-import { Routes, Route } from 'react-router'
-import HomePage from './pages/HomePage'
-import DoctorPage from './pages/DoctorPage'
-import PharmacistPage from './pages/PharmacistPage'
-import PatientPage from './pages/PatientPage'
-import AdminPage from './pages/AdminPage'
-import RolePage from './pages/RolePage'
-import PatientInfo from './pages/PatientInfo.jsx'
+import { Routes, Route } from 'react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './context/AuthContext';
+import { PrivateRoute } from './routes/PrivateRoute';
+import LoginPage from './pages/LoginPage';
+import PatientDashboard from './pages/PatientDashboard';
+import PatientForm from './pages/PatientForm';
+import DoctorManagement from './pages/DoctorManagement';
+import DoctorForm from './pages/DoctorForm';
+import DoctorDashboard from './pages/DoctorDashboard';
+import CheckupForm from './pages/CheckupForm';
 
-const App = () => {
+const qc = new QueryClient({ 
+  defaultOptions: { 
+    queries: { 
+      refetchOnWindowFocus: false, 
+      retry: 1 
+    } 
+  } 
+});
+
+function App() {
   return (
-    <div data-theme="emerald">
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/doctor" element={<DoctorPage />} />
-        <Route path="/pharmacist" element={<PharmacistPage />} />
-        <Route path="/patient" element={<PatientPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/role" element={<RolePage />} />
-        <Route path="/patient/info" element={<PatientInfo />} />
-      </Routes>
-    </div>
-  )
+    <QueryClientProvider client={qc}>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/patients" element={<PrivateRoute roles={['admin']}><PatientDashboard /></PrivateRoute>} />
+          <Route path="/admin/patients/new" element={<PrivateRoute roles={['admin']}><PatientForm /></PrivateRoute>} />
+          <Route path="/admin/patients/:id/edit" element={<PrivateRoute roles={['admin']}><PatientForm /></PrivateRoute>} />
+          
+          <Route path="/admin/doctors" element={<PrivateRoute roles={['admin']}><DoctorManagement /></PrivateRoute>} />
+          <Route path="/admin/doctors/new" element={<PrivateRoute roles={['admin']}><DoctorForm /></PrivateRoute>} />
+          <Route path="/admin/doctors/:id/edit" element={<PrivateRoute roles={['admin']}><DoctorForm /></PrivateRoute>} />
+          
+          {/* Doctor Routes */}
+          <Route path="/doctor/dashboard" element={<PrivateRoute roles={['doctor']}><DoctorDashboard /></PrivateRoute>} />
+          <Route path="/doctor/checkup/:patientId" element={<PrivateRoute roles={['doctor']}><CheckupForm /></PrivateRoute>} />
+          
+          <Route path="*" element={<LoginPage />} />
+        </Routes>
+        <Toaster />
+        <ReactQueryDevtools />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
 }
 
-export default App
+export default App;
