@@ -1,47 +1,50 @@
 import express from 'express';
 import {
-  createPatient,
-  getAllPatients,
+  // Patient routes
+  getPatients,
   getPatient,
+  createPatient,
   updatePatient,
   deletePatient,
-  createDoctor,
-  getAllDoctors,
+  // Doctor routes
+  getDoctors,
   getDoctor,
+  createDoctor,
   updateDoctor,
   deleteDoctor,
-  assignDoctor,
+  assignDoctorToPatient,
+  getAvailableDoctors,
 } from '../controller/adminController.js';
 import { protect, restrictTo } from '../middleware/authWare.js';
-import { checkPermission } from '../middleware/RBACWare.js';
 
 const router = express.Router();
 
-// All routes require authentication and admin role
+// Protect all routes
 router.use(protect);
 router.use(restrictTo('admin'));
 
-// ============ PATIENT ROUTES ============
+// Patient routes
 router.route('/patient')
-  .post(checkPermission(['patient:write']), createPatient)
-  .get(checkPermission(['patient:read']), getAllPatients);
+  .get(getPatients)
+  .post(createPatient);
 
 router.route('/patient/:id')
-  .get(checkPermission(['patient:read']), getPatient)
-  .put(checkPermission(['patient:write']), updatePatient)
-  .delete(checkPermission(['patient:delete']), deletePatient);
+  .get(getPatient)
+  .put(updatePatient)
+  .delete(deletePatient);
 
-// ============ DOCTOR ROUTES ============
+// Doctor routes
 router.route('/doctor')
-  .post(checkPermission(['doctor:write']), createDoctor)
-  .get(checkPermission(['doctor:read']), getAllDoctors);
+  .get(getDoctors)
+  .post(createDoctor);
 
 router.route('/doctor/:id')
-  .get(checkPermission(['doctor:read']), getDoctor)
-  .put(checkPermission(['doctor:write']), updateDoctor)
-  .delete(checkPermission(['doctor:delete']), deleteDoctor);
+  .get(getDoctor)
+  .put(updateDoctor)
+  .delete(deleteDoctor);
 
-// ============ ASSIGNMENT ROUTE ============
-router.post('/assign-doctor', checkPermission(['assignment:write']), assignDoctor);
+// Assignment routes
+router.post('/assign-doctor', assignDoctorToPatient);
+router.get('/available-doctors', getAvailableDoctors);
 
 export default router;

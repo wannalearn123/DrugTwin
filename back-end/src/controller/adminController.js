@@ -1,15 +1,15 @@
-import Patient from '../model/patient.js';
-import Doctor from '../model/doctor.js';
-import User from '../model/user.js';
+import Patient from '../model/Patient.js';
+import Doctor from '../model/Doctor.js';
+import User from '../model/User.js';
 import { AppError } from '../middleware/errorHandler.js';
 import logger from '../utils/logger.js';
 
-// ============ PATIENT CRUD ============
+// ==================== PATIENT MANAGEMENT ====================
 
 // Create Patient
 export const createPatient = async (req, res, next) => {
   try {
-    const { userId, name, dateOfBirth, phone, bloodType, allergies, emergencyContact } = req.body;
+    const { userId, name, dateOfBirth, phone, bloodType, allergies, emergencyContact, assignedDoctorId } = req.body;
 
     // Validate required fields
     if (!userId || !name || !dateOfBirth || !phone) {
@@ -39,7 +39,11 @@ export const createPatient = async (req, res, next) => {
       bloodType,
       allergies,
       emergencyContact,
+      assignedDoctorId,
     });
+
+    await patient.populate('userId', 'name email');
+    await patient.populate('assignedDoctorId', 'name specialization');
 
     logger.info(`Patient created: ${patient._id} by admin: ${req.user.email}`);
 
@@ -54,18 +58,21 @@ export const createPatient = async (req, res, next) => {
 };
 
 // Get All Patients
-export const getAllPatients = async (req, res, next) => {
+export const getPatients = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, isActive } = req.query;
+    const { page = 1, limit = 10, isActive, search } = req.query;
 
     const filter = {};
     if (isActive !== undefined) {
       filter.isActive = isActive === 'true';
     }
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' };
+    }
 
     const patients = await Patient.find(filter)
       .populate('userId', 'name email')
-      .populate('assignedDoctorId', 'name email')
+      .populate('assignedDoctorId', 'name specialization')
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 });
@@ -77,7 +84,7 @@ export const getAllPatients = async (req, res, next) => {
       data: {
         patients,
         totalPages: Math.ceil(count / limit),
-        currentPage: page,
+        currentPage: Number(page),
         total: count,
       },
     });
@@ -91,7 +98,7 @@ export const getPatient = async (req, res, next) => {
   try {
     const patient = await Patient.findById(req.params.id)
       .populate('userId', 'name email')
-      .populate('assignedDoctorId', 'name email licenseNumber');
+      .populate('assignedDoctorId', 'name specialization licenseNumber');
 
     if (!patient) {
       throw new AppError('Patient not found', 404);
@@ -109,13 +116,15 @@ export const getPatient = async (req, res, next) => {
 // Update Patient
 export const updatePatient = async (req, res, next) => {
   try {
-    const { name, dateOfBirth, phone, bloodType, allergies, emergencyContact } = req.body;
+    const { name, dateOfBirth, phone, bloodType, allergies, emergencyContact, assignedDoctorId } = req.body;
 
     const patient = await Patient.findByIdAndUpdate(
       req.params.id,
-      { name, dateOfBirth, phone, bloodType, allergies, emergencyContact },
+      { name, dateOfBirth, phone, bloodType, allergies, emergencyContact, assignedDoctorId },
       { new: true, runValidators: true }
-    );
+    )
+      .populate('userId', 'name email')
+      .populate('assignedDoctorId', 'name specialization');
 
     if (!patient) {
       throw new AppError('Patient not found', 404);
@@ -153,16 +162,16 @@ export const deletePatient = async (req, res, next) => {
   }
 };
 
-// ============ DOCTOR CRUD ============
+// ==================== DOCTOR MANAGEMENT ====================
 
 // Create Doctor
 export const createDoctor = async (req, res, next) => {
   try {
-    const { userId, licenseNumber, specialties, qualifications, experienceYears, consultationFee } = req.body;
+    const { userId, name, specialization, licenseNumber, phone } = req.body;
 
     // Validate required fields
-    if (!userId || !licenseNumber || !specialties || specialties.length === 0) {
-      throw new AppError('userId, licenseNumber, and specialties are required', 400);
+    if (!userId || !name || !specialization || !licenseNumber) {
+      throw new AppError('Please provide all required fields', 400);
     }
 
     // Check if user exists and has doctor role
@@ -170,6 +179,7 @@ export const createDoctor = async (req, res, next) => {
     if (!user) {
       throw new AppError('User not found', 404);
     }
+
     if (user.role !== 'doctor') {
       throw new AppError('User must have doctor role', 400);
     }
@@ -177,17 +187,24 @@ export const createDoctor = async (req, res, next) => {
     // Check if doctor profile already exists
     const existingDoctor = await Doctor.findOne({ userId });
     if (existingDoctor) {
-      throw new AppError('Doctor profile already exists for this user', 409);
+      throw new AppError('Doctor profile already exists for this user', 400);
+    }
+
+    // Check license number uniqueness
+    const existingLicense = await Doctor.findOne({ licenseNumber });
+    if (existingLicense) {
+      throw new AppError('License number already registered', 400);
     }
 
     const doctor = await Doctor.create({
       userId,
+      name,
+      specialization,
       licenseNumber,
-      specialties,
-      qualifications,
-      experienceYears,
-      consultationFee,
+      phone,
     });
+
+    await doctor.populate('userId', 'name email');
 
     logger.info(`Doctor created: ${doctor._id} by admin: ${req.user.email}`);
 
@@ -202,20 +219,26 @@ export const createDoctor = async (req, res, next) => {
 };
 
 // Get All Doctors
-export const getAllDoctors = async (req, res, next) => {
+export const getDoctors = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, specialty, isActive } = req.query;
+    const { page = 1, limit = 10, search, specialization, isActive } = req.query;
 
     const filter = {};
-    if (specialty) {
-      filter.specialties = { $in: [specialty] };
+    
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' };
     }
+    
+    if (specialization) {
+      filter.specialization = specialization;
+    }
+
     if (isActive !== undefined) {
       filter.isActive = isActive === 'true';
     }
 
     const doctors = await Doctor.find(filter)
-      .populate('userId', 'name email')
+      .populate('userId', 'name email isActive')
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 });
@@ -227,7 +250,7 @@ export const getAllDoctors = async (req, res, next) => {
       data: {
         doctors,
         totalPages: Math.ceil(count / limit),
-        currentPage: page,
+        currentPage: Number(page),
         total: count,
       },
     });
@@ -240,16 +263,23 @@ export const getAllDoctors = async (req, res, next) => {
 export const getDoctor = async (req, res, next) => {
   try {
     const doctor = await Doctor.findById(req.params.id)
-      .populate('userId', 'name email')
-      .populate('assignedPatients', 'name phone');
+      .populate('userId', 'name email isActive');
 
     if (!doctor) {
       throw new AppError('Doctor not found', 404);
     }
 
+    // Get assigned patients count
+    const patientCount = await Patient.countDocuments({ 
+      assignedDoctorId: doctor._id 
+    });
+
     res.status(200).json({
       status: 'success',
-      data: { doctor },
+      data: {
+        doctor,
+        patientCount,
+      },
     });
   } catch (error) {
     next(error);
@@ -259,24 +289,38 @@ export const getDoctor = async (req, res, next) => {
 // Update Doctor
 export const updateDoctor = async (req, res, next) => {
   try {
-    const { licenseNumber, specialties, qualifications, experienceYears, consultationFee, availableSlots } = req.body;
+    const { name, specialization, licenseNumber, phone, isActive } = req.body;
 
-    const doctor = await Doctor.findByIdAndUpdate(
-      req.params.id,
-      { licenseNumber, specialties, qualifications, experienceYears, consultationFee, availableSlots },
-      { new: true, runValidators: true }
-    );
-
+    const doctor = await Doctor.findById(req.params.id);
+    
     if (!doctor) {
       throw new AppError('Doctor not found', 404);
     }
 
-    logger.info(`Doctor updated: ${doctor._id} by admin: ${req.user.email}`);
+    // Check license number uniqueness if changed
+    if (licenseNumber && licenseNumber !== doctor.licenseNumber) {
+      const existingLicense = await Doctor.findOne({ 
+        licenseNumber, 
+        _id: { $ne: req.params.id } 
+      });
+      
+      if (existingLicense) {
+        throw new AppError('License number already registered', 400);
+      }
+    }
+
+    const updatedDoctor = await Doctor.findByIdAndUpdate(
+      req.params.id,
+      { name, specialization, licenseNumber, phone, isActive },
+      { new: true, runValidators: true }
+    ).populate('userId', 'name email');
+
+    logger.info(`Doctor updated: ${updatedDoctor._id} by admin: ${req.user.email}`);
 
     res.status(200).json({
       status: 'success',
       message: 'Doctor updated successfully',
-      data: { doctor },
+      data: { doctor: updatedDoctor },
     });
   } catch (error) {
     next(error);
@@ -286,13 +330,27 @@ export const updateDoctor = async (req, res, next) => {
 // Delete Doctor
 export const deleteDoctor = async (req, res, next) => {
   try {
-    const doctor = await Doctor.findByIdAndDelete(req.params.id);
+    const doctor = await Doctor.findById(req.params.id);
 
     if (!doctor) {
       throw new AppError('Doctor not found', 404);
     }
 
-    logger.info(`Doctor deleted: ${doctor._id} by admin: ${req.user.email}`);
+    // Check if doctor has assigned patients
+    const patientCount = await Patient.countDocuments({ 
+      assignedDoctorId: doctor._id 
+    });
+
+    if (patientCount > 0) {
+      throw new AppError(
+        `Cannot delete doctor with ${patientCount} assigned patient(s). Please reassign patients first.`,
+        400
+      );
+    }
+
+    await Doctor.findByIdAndDelete(req.params.id);
+
+    logger.info(`Doctor deleted: ${req.params.id} by admin: ${req.user.email}`);
 
     res.status(200).json({
       status: 'success',
@@ -303,60 +361,59 @@ export const deleteDoctor = async (req, res, next) => {
   }
 };
 
-// ============ ASSIGN DOCTOR TO PATIENT ============
+// ==================== ASSIGNMENT ====================
 
-export const assignDoctor = async (req, res, next) => {
+// Assign doctor to patient
+export const assignDoctorToPatient = async (req, res, next) => {
   try {
     const { patientId, doctorId } = req.body;
 
-    // Validate required fields
     if (!patientId || !doctorId) {
-      throw new AppError('patientId and doctorId are required', 400);
+      throw new AppError('Patient ID and Doctor ID are required', 400);
     }
 
-    // Find patient
     const patient = await Patient.findById(patientId);
     if (!patient) {
       throw new AppError('Patient not found', 404);
     }
 
-    // Find doctor
     const doctor = await Doctor.findById(doctorId);
     if (!doctor) {
       throw new AppError('Doctor not found', 404);
     }
 
-    // Check if doctor is active
     if (!doctor.isActive) {
       throw new AppError('Cannot assign inactive doctor', 400);
     }
 
-    // Remove patient from previous doctor's list if exists
-    if (patient.assignedDoctorId) {
-      await Doctor.findByIdAndUpdate(
-        patient.assignedDoctorId,
-        { $pull: { assignedPatients: patientId } }
-      );
-    }
-
-    // Assign doctor to patient
     patient.assignedDoctorId = doctorId;
     await patient.save();
 
-    // Add patient to doctor's assigned patients
-    if (!doctor.assignedPatients.includes(patientId)) {
-      doctor.assignedPatients.push(patientId);
-      await doctor.save();
-    }
+    await patient.populate('assignedDoctorId', 'name specialization');
 
     logger.info(`Doctor ${doctorId} assigned to patient ${patientId} by admin: ${req.user.email}`);
 
     res.status(200).json({
       status: 'success',
       message: 'Doctor assigned to patient successfully',
-      data: {
-        patient: await Patient.findById(patientId).populate('assignedDoctorId', 'licenseNumber specialties'),
-      },
+      data: { patient },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get available doctors for assignment
+export const getAvailableDoctors = async (req, res, next) => {
+  try {
+    const doctors = await Doctor.find({ isActive: true })
+      .populate('userId', 'name email')
+      .select('name specialization licenseNumber')
+      .sort({ name: 1 });
+
+    res.status(200).json({
+      status: 'success',
+      data: { doctors },
     });
   } catch (error) {
     next(error);

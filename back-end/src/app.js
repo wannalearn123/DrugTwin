@@ -7,6 +7,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import doctorRoutes from './routes/doctorRoutes.js';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/doctor', doctorRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

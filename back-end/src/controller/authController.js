@@ -70,36 +70,38 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
-      throw new AppError('Email and password are required', 400);
+      throw new AppError('Please provide email and password', 400);
     }
 
-    // Find user and include password
     const user = await User.findOne({ email }).select('+password');
 
     if (!user || !(await user.comparePassword(password))) {
       throw new AppError('Invalid email or password', 401);
     }
 
-    // Check if user is active
     if (!user.isActive) {
-      throw new AppError('Your account has been deactivated', 403);
+      throw new AppError('Your account has been deactivated', 401);
     }
 
-    // Generate token
     const token = generateToken(user._id);
 
-    // Remove password from response
-    user.password = undefined;
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
 
     logger.info(`User logged in: ${email}`);
 
+    // Make sure response structure matches frontend expectation
     res.status(200).json({
       status: 'success',
       message: 'Login successful',
       data: {
-        user,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
         token,
       },
     });
