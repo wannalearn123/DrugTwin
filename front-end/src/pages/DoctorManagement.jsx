@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { useDoctors, useDeleteDoctor } from '../hooks/useDoctor';
 import { Link } from 'react-router';
-import { Search, UserPlus, Edit, Trash2, Users } from 'lucide-react';
+import { Search, UserPlus, Edit, Trash2, Eye } from 'lucide-react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 
 const DoctorManagement = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const { data, isLoading } = useDoctors({ page, limit: 10, search });
+  const { data, isLoading } = useDoctors({ page, limit: 10 });
   const deleteMut = useDeleteDoctor();
 
   const handleDelete = (id, name) => {
-    if (confirm(`Delete doctor ${name}?`)) {
-      deleteMut.mutate(id);
-    }
+    if (confirm(`Delete doctor ${name}?`)) deleteMut.mutate(id);
   };
 
   if (isLoading) {
@@ -27,6 +25,9 @@ const DoctorManagement = () => {
   }
 
   const { doctors = [], total = 0, totalPages = 1 } = data?.data || {};
+  const filtered = doctors.filter(d => 
+    !search || d.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <DashboardLayout>
@@ -77,44 +78,51 @@ const DoctorManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {doctors.length === 0 ? (
+              {filtered.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-8 text-gray-500">
                     No doctors found
                   </td>
                 </tr>
               ) : (
-                doctors.map((doctor) => (
-                  <tr key={doctor._id} className="hover">
+                filtered.map((d) => (
+                  <tr key={d._id} className="hover">
                     <td>
-                      <div className="font-semibold">{doctor.name}</div>
-                      <div className="text-sm text-gray-500">{doctor.userId?.email}</div>
+                      <div className="font-semibold">{d.name}</div>
+                      <div className="text-sm text-gray-500">{d.userId?.email}</div>
                     </td>
                     <td>
-                      <span className="badge badge-ghost">{doctor.specialization}</span>
+                      <span className="badge badge-ghost">{d.userId?.specialization}</span>
                     </td>
-                    <td>{doctor.licenseNumber}</td>
-                    <td>{doctor.phone}</td>
+                    <td>{d.licenseNumber}</td>
+                    <td>{d.phone}</td>
                     <td>
-                      <span className={`badge ${doctor.isActive ? 'badge-success' : 'badge-error'}`}>
-                        {doctor.isActive ? 'Active' : 'Inactive'}
+                      <span className={`badge ${d.isActive ? 'badge-success' : 'badge-error'}`}>
+                        {d.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td className="flex gap-2">
                       <Link
-                        to={`/admin/doctors/${doctor._id}/edit`}
+                        to={`/admin/doctors/${d._id}`}
                         className="btn btn-ghost btn-sm"
                         title="Edit"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Eye className="size-4" />
+                      </Link>
+                      <Link
+                        to={`/admin/doctors/${d._id}/edit`}
+                        className="btn btn-ghost btn-sm"
+                        title="Edit"
+                      >
+                        <Edit className="size-4" />
                       </Link>
                       <button
-                        onClick={() => handleDelete(doctor._id, doctor.name)}
+                        onClick={() => handleDelete(d._id, d.name)}
                         className="btn btn-ghost btn-sm text-error"
                         title="Delete"
                         disabled={deleteMut.isLoading}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="size-4" />
                       </button>
                     </td>
                   </tr>

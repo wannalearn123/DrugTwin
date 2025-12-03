@@ -7,8 +7,11 @@ import { PrivateRoute } from './routes/PrivateRoute';
 import LoginPage from './pages/LoginPage';
 import PatientDashboard from './pages/PatientDashboard';
 import PatientForm from './pages/PatientForm';
+import PatientDetail from './pages/PatientDetail';
+import AssignDoctor from './pages/AssignDoctor';
 import DoctorManagement from './pages/DoctorManagement';
 import DoctorForm from './pages/DoctorForm';
+import DoctorDetail from './pages/DoctorDetail';
 import DoctorDashboard from './pages/DoctorDashboard';
 import CheckupForm from './pages/CheckupForm';
 
@@ -31,10 +34,13 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin/patients" element={<PrivateRoute roles={['admin']}><PatientDashboard /></PrivateRoute>} />
           <Route path="/admin/patients/new" element={<PrivateRoute roles={['admin']}><PatientForm /></PrivateRoute>} />
+          <Route path="/admin/patients/:id" element={<PrivateRoute roles={['admin']}><PatientDetail /></PrivateRoute>} />
           <Route path="/admin/patients/:id/edit" element={<PrivateRoute roles={['admin']}><PatientForm /></PrivateRoute>} />
+          <Route path="/admin/patients/:id/assign-doctor" element={<PrivateRoute roles={['admin']}><AssignDoctor /></PrivateRoute>} />
           
           <Route path="/admin/doctors" element={<PrivateRoute roles={['admin']}><DoctorManagement /></PrivateRoute>} />
           <Route path="/admin/doctors/new" element={<PrivateRoute roles={['admin']}><DoctorForm /></PrivateRoute>} />
+          <Route path="/admin/doctors/:id" element={<PrivateRoute roles={['admin']}><DoctorDetail /></PrivateRoute>} />
           <Route path="/admin/doctors/:id/edit" element={<PrivateRoute roles={['admin']}><DoctorForm /></PrivateRoute>} />
           
           {/* Doctor Routes */}

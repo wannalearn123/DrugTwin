@@ -1,6 +1,6 @@
 import Patient from '../model/Patient.js';
 import Doctor from '../model/Doctor.js';
-import User from '../model/User.js';
+import User from '../model/user.js';
 import { AppError } from '../middleware/errorHandler.js';
 import logger from '../utils/logger.js';
 
