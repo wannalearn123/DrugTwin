@@ -88,7 +88,7 @@ const PatientDashboard = () => {
                 filtered.map((p) => (
                   <tr key={p._id} className="hover">
                     <td>
-                      <div className="font-semibold">{p.name}</div>
+                      <div className="font-semibold">{p.userId?.name}</div>
                       <div className="text-sm text-gray-500">{p.userId?.email}</div>
                     </td>
                     <td>{new Date(p.dateOfBirth).toLocaleDateString()}</td>
@@ -109,14 +109,14 @@ const PatientDashboard = () => {
                         className="btn btn-ghost btn-sm"
                         title="View"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="size-4" />
                       </Link>
                       <Link
                         to={`/admin/patients/${p._id}/edit`}
                         className="btn btn-ghost btn-sm"
                         title="Edit"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="size-4" />
                       </Link>
                       <button
                         onClick={() => handleDelete(p._id, p.name)}
@@ -124,7 +124,7 @@ const PatientDashboard = () => {
                         title="Delete"
                         disabled={removeMut.isLoading}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="size-4" />
                       </button>
                     </td>
                   </tr>
