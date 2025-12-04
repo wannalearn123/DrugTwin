@@ -1,0 +1,15 @@
+meta {
+  name: Get All Patients
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/admin/patient?page=1&limit=10
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjY4Mzc2ZjdiZWNhZTVlMmQ5ODk3NSIsImlhdCI6MTc2NDIyNDYzNywiZXhwIjoxNzY0ODI5NDM3fQ.NT7MvXrLhbrXb5Fqko2cA2nJiTKdRHjLdkn3HjwCEkY
+}

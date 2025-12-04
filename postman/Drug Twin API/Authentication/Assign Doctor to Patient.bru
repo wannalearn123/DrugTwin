@@ -1,0 +1,22 @@
+meta {
+  name: Assign Doctor to Patient
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/api/admin/assign-doctor
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "patientId": "PATIENT_ID_HERE",
+    "doctorId": "DOCTOR_ID_HERE"
+  }
+}

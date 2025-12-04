@@ -1,0 +1,19 @@
+meta {
+  name: Get Profile
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base_url}}/api/auth/profile
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+settings {
+  encodeUrl: true
+}

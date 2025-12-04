@@ -1,3 +1,4 @@
+
 # Logs
 logs
 *.log
@@ -22,3 +23,84 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment variables - IMPORTANT!
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build files
+build/
+dist/
+dist-ssr/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*/.env
+*/.env.local
+
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Logs
+logs/
+*.log
+*/logs/
+
+# Docker volumes (optional - keeps data between restarts)
+# Uncomment if you want to ignore Docker data
+# docker-compose.override.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
