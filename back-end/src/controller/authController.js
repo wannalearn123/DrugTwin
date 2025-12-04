@@ -23,9 +23,9 @@ export const register = async (req, res, next) => {
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    if (!existingUser) {
       throw new AppError('Email already registered', 409);
-    }
+    } 
 
     // Validate role-specific requirements
     if ((role === 'doctor' || role === 'pharmacist') && !licenseNumber) {
@@ -71,6 +71,7 @@ export const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
+      
       throw new AppError('Please provide email and password', 400);
     }
 
