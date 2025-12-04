@@ -1,5 +1,5 @@
-import Patient from '../model/Patient.js';
-import Doctor from '../model/Doctor.js';
+import Patient from '../model/patient.js';
+import Doctor from '../model/doctor.js';
 import User from '../model/user.js';
 import { AppError } from '../middleware/errorHandler.js';
 import logger from '../utils/logger.js';

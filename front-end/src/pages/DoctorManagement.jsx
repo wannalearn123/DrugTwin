@@ -88,14 +88,14 @@ const DoctorManagement = () => {
                 filtered.map((d) => (
                   <tr key={d._id} className="hover">
                     <td>
-                      <div className="font-semibold">{d.name}</div>
+                      <div className="font-semibold">{d.userId?.name}</div>
                       <div className="text-sm text-gray-500">{d.userId?.email}</div>
                     </td>
                     <td>
-                      <span className="badge badge-ghost">{d.userId?.specialization}</span>
+                      <span className="">{d.specialization}</span>
                     </td>
                     <td>{d.licenseNumber}</td>
-                    <td>{d.phone}</td>
+                    <td>{d.userId?.phone}</td>
                     <td>
                       <span className={`badge ${d.isActive ? 'badge-success' : 'badge-error'}`}>
                         {d.isActive ? 'Active' : 'Inactive'}
