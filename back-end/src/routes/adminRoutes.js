@@ -14,6 +14,13 @@ import {
   deleteDoctor,
   assignDoctorToPatient,
   getAvailableDoctors,
+  // User routes
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUserById,
+  deleteUserById,
+  toggleUserStatus,
 } from '../controller/adminController.js';
 import { protect, restrictTo } from '../middleware/authWare.js';
 
@@ -23,7 +30,19 @@ const router = express.Router();
 router.use(protect);
 router.use(restrictTo('admin'));
 
-// Patient routes
+// ========== USER ROUTES ==========
+router.route('/user')
+  .get(getAllUsers)
+  .post(createUser);
+
+router.route('/user/:id')
+  .get(getUserById)
+  .put(updateUserById)
+  .delete(deleteUserById);
+
+router.patch('/user/:id/toggle-status', toggleUserStatus);
+
+// ========== PATIENT ROUTES ==========
 router.route('/patient')
   .get(getPatients)
   .post(createPatient);
@@ -33,7 +52,7 @@ router.route('/patient/:id')
   .put(updatePatient)
   .delete(deletePatient);
 
-// Doctor routes
+// ========== DOCTOR ROUTES ==========
 router.route('/doctor')
   .get(getDoctors)
   .post(createDoctor);
@@ -43,7 +62,7 @@ router.route('/doctor/:id')
   .put(updateDoctor)
   .delete(deleteDoctor);
 
-// Assignment routes
+// ========== ASSIGNMENT ROUTES ==========
 router.post('/assign-doctor', assignDoctorToPatient);
 router.get('/available-doctors', getAvailableDoctors);
 

@@ -1,5 +1,5 @@
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, Users, Stethoscope, User, UserCog } from 'lucide-react';
+import { LogOut, Users, Stethoscope, User, UserCog, UsersRound } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 
 const DashboardLayout = ({ children }) => {
@@ -17,6 +17,13 @@ const DashboardLayout = ({ children }) => {
           <div className="hidden md:flex ml-4 gap-2">
             {user?.role === 'admin' && (
               <>
+                <Link 
+                  to="/admin/users" 
+                  className={`btn btn-ghost gap-2 ${isActive('/admin/users') ? 'btn-active' : ''}`}
+                >
+                  <UsersRound className="w-4 h-4" />
+                  Users
+                </Link>
                 <Link 
                   to="/admin/patients" 
                   className={`btn btn-ghost gap-2 ${isActive('/admin/patients') ? 'btn-active' : ''}`}
