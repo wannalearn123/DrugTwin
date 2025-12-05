@@ -419,3 +419,268 @@ export const getAvailableDoctors = async (req, res, next) => {
     next(error);
   }
 };
+
+// ==================== USER MANAGEMENT ====================
+
+// Get all users
+export const getAllUsers = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10, role, isActive, search } = req.query;
+
+    const filter = {};
+    
+    if (role) {
+      filter.role = role;
+    }
+    
+    if (isActive !== undefined) {
+      filter.isActive = isActive === 'true';
+    }
+    
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const users = await User.find(filter)
+      .select('-password')
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 });
+
+    const count = await User.countDocuments(filter);
+
+    // Get profile status for each user
+    const usersWithStatus = await Promise.all(
+      users.map(async (user) => {
+        const userObj = user.toObject();
+        
+        if (user.role === 'patient') {
+          const patient = await Patient.findOne({ userId: user._id });
+          userObj.hasProfile = !!patient;
+          userObj.profileId = patient?._id;
+        } else if (user.role === 'doctor') {
+          const doctor = await Doctor.findOne({ userId: user._id });
+          userObj.hasProfile = !!doctor;
+          userObj.profileId = doctor?._id;
+        } else {
+          userObj.hasProfile = false;
+          userObj.profileId = null;
+        }
+        
+        return userObj;
+      })
+    );
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        users: usersWithStatus,
+        totalPages: Math.ceil(count / limit),
+        currentPage: Number(page),
+        total: count,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get single user
+export const getUserById = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    // Get associated profile
+    let profile = null;
+    if (user.role === 'patient') {
+      profile = await Patient.findOne({ userId: user._id })
+        .populate('assignedDoctorId', 'name specialization');
+    } else if (user.role === 'doctor') {
+      profile = await Doctor.findOne({ userId: user._id });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user,
+        profile,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Create new user (by admin)
+export const createUser = async (req, res, next) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !password || !role) {
+      throw new AppError('Name, email, password, and role are required', 400);
+    }
+
+    // Validate role
+    const validRoles = ['patient', 'doctor', 'pharmacist', 'admin'];
+    if (!validRoles.includes(role)) {
+      throw new AppError(`Invalid role. Must be one of: ${validRoles.join(', ')}`, 400);
+    }
+
+    // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw new AppError('Email already registered', 409);
+    }
+
+    // Create user
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role,
+      isActive: true,
+    });
+
+    // Remove password from response
+    user.password = undefined;
+
+    logger.info(`User created by admin: ${user.email} with role: ${user.role} by ${req.user.email}`);
+
+    res.status(201).json({
+      status: 'success',
+      message: 'User created successfully',
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Update user
+export const updateUserById = async (req, res, next) => {
+  try {
+    const { name, email, role, isActive, password } = req.body;
+
+    const user = await User.findById(req.params.id);
+    
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    // Check if email is being changed and if it's already taken
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ 
+        email, 
+        _id: { $ne: req.params.id } 
+      });
+      
+      if (existingUser) {
+        throw new AppError('Email already in use', 409);
+      }
+    }
+
+    // Update fields
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (role) user.role = role;
+    if (isActive !== undefined) user.isActive = isActive;
+    if (password) user.password = password; // Will be hashed by pre-save hook
+
+    await user.save();
+    user.password = undefined;
+
+    logger.info(`User updated: ${user.email} by admin: ${req.user.email}`);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'User updated successfully',
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete user
+export const deleteUserById = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    // Prevent deleting admin's own account
+    if (user._id.toString() === req.user._id.toString()) {
+      throw new AppError('You cannot delete your own account', 403);
+    }
+
+    // Check for associated profiles
+    if (user.role === 'patient') {
+      const patient = await Patient.findOne({ userId: user._id });
+      if (patient) {
+        throw new AppError(
+          'Cannot delete user with active patient profile. Delete patient profile first.',
+          400
+        );
+      }
+    } else if (user.role === 'doctor') {
+      const doctor = await Doctor.findOne({ userId: user._id });
+      if (doctor) {
+        const patientCount = await Patient.countDocuments({ assignedDoctorId: doctor._id });
+        if (patientCount > 0) {
+          throw new AppError(
+            `Cannot delete doctor with ${patientCount} assigned patients. Reassign patients first.`,
+            400
+          );
+        }
+        // Delete doctor profile
+        await Doctor.findByIdAndDelete(doctor._id);
+      }
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    logger.info(`User deleted: ${user.email} by admin: ${req.user.email}`);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'User deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Toggle user active status
+export const toggleUserStatus = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    user.isActive = !user.isActive;
+    await user.save();
+    user.password = undefined;
+
+    logger.info(`User status toggled: ${user.email} is now ${user.isActive ? 'active' : 'inactive'} by admin: ${req.user.email}`);
+
+    res.status(200).json({
+      status: 'success',
+      message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

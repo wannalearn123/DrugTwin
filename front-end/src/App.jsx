@@ -14,6 +14,9 @@ import DoctorForm from './pages/DoctorForm';
 import DoctorDetail from './pages/DoctorDetail';
 import DoctorDashboard from './pages/DoctorDashboard';
 import CheckupForm from './pages/CheckupForm';
+import UserForm from './pages/UserForm';
+import UserManagement from './pages/UserManagement';
+
 
 const qc = new QueryClient({ 
   defaultOptions: { 
@@ -32,6 +35,9 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           
           {/* Admin Routes */}
+          <Route path="/admin/users" element={<PrivateRoute roles={['admin']}><UserManagement /></PrivateRoute>} />
+          <Route path="/admin/users/new" element={<PrivateRoute roles={['admin']}><UserForm /></PrivateRoute>} />
+
           <Route path="/admin/patients" element={<PrivateRoute roles={['admin']}><PatientDashboard /></PrivateRoute>} />
           <Route path="/admin/patients/new" element={<PrivateRoute roles={['admin']}><PatientForm /></PrivateRoute>} />
           <Route path="/admin/patients/:id" element={<PrivateRoute roles={['admin']}><PatientDetail /></PrivateRoute>} />

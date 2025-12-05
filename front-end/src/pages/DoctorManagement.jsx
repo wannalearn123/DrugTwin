@@ -92,7 +92,7 @@ const DoctorManagement = () => {
                       <div className="text-sm text-gray-500">{d.userId?.email}</div>
                     </td>
                     <td>
-                      <span className="">{d.specialization}</span>
+                      <span className="">{d.specialties.join(', ')}</span>
                     </td>
                     <td>{d.licenseNumber}</td>
                     <td>{d.userId?.phone}</td>

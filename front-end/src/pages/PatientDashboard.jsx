@@ -88,7 +88,7 @@ const PatientDashboard = () => {
                 filtered.map((p) => (
                   <tr key={p._id} className="hover">
                     <td>
-                      <div className="font-semibold">{p.userId?.name}</div>
+                      <div className="font-semibold">{p.name}</div>
                       <div className="text-sm text-gray-500">{p.userId?.email}</div>
                     </td>
                     <td>{new Date(p.dateOfBirth).toLocaleDateString()}</td>
