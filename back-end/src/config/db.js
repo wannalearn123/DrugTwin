@@ -4,7 +4,15 @@ import config from './env.js';
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(config.database.mongoUri);
+    if (!config.database.mongoUri) {
+      logger.warn('MongoDB URI not provided, running in memory mode');
+      return;
+    }
+
+    const conn = await mongoose.connect(config.database.mongoUri, {
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    });
     
     logger.info(`MongoDB Connected: ${conn.connection.host}`);
     
@@ -18,7 +26,8 @@ const connectDB = async () => {
 
   } catch (error) {
     logger.error('Error connecting to MongoDB:', error);
-    process.exit(1);
+    logger.warn('Server will continue without database connection');
+    // Don't exit process, allow server to run for API testing
   }
 };
 
