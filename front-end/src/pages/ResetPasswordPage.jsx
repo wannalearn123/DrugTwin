@@ -183,9 +183,9 @@ const ResetPasswordPage = () => {
             </button>
           </form>
           
-          <Link to="/" className="btn btn-ghost w-full">
+          <Link to="/login" className="btn btn-ghost w-full">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali ke Beranda
+            Kembali ke Login
           </Link>
         </div>
       </div>
