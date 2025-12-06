@@ -13,9 +13,9 @@ const UserManagement = () => {
   const { data, isLoading, error } = useUsers({ 
     page, 
     limit: 10, 
-    search,
-    role: roleFilter,
-    isActive: statusFilter,
+    search, 
+    role: roleFilter, 
+    status: statusFilter 
   });
   
   const deleteMut = useDeleteUser();
@@ -60,11 +60,6 @@ const UserManagement = () => {
   }
 
   const { users = [], total = 0, totalPages = 1 } = data?.data || {};
-
-  // ❌ REMOVE THIS - API already handles search
-  // const filtered = users.filter(u => 
-  //   !search || u.name.toLowerCase().includes(search.toLowerCase())
-  // );
 
   const getRoleBadgeClass = (role) => {
     const classes = {

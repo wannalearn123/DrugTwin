@@ -7,7 +7,7 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 const DoctorManagement = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const { data, isLoading } = useDoctors({ page, limit: 10 });
+  const { data, isLoading } = useDoctors({ page, limit: 10, search });
   const deleteMut = useDeleteDoctor();
 
   const handleDelete = (id, name) => {
@@ -92,7 +92,7 @@ const DoctorManagement = () => {
                       <div className="text-sm text-gray-500">{d.userId?.email}</div>
                     </td>
                     <td>
-                      <span className="">{d.specialties.join(', ')}</span>
+                      <span className="">{d.specialties.join(', ')}</span>  
                     </td>
                     <td>{d.licenseNumber}</td>
                     <td>{d.userId?.phone}</td>

@@ -4,18 +4,11 @@ import toast from 'react-hot-toast';
 
 const USERS_KEY = 'users';
 
-export const useUsers = (filters = {}) => {
-  const query = useQuery({
+export const useUsers = (filters = {}) => 
+  useQuery({
     queryKey: [USERS_KEY, filters],
-    queryFn: () => {
-      console.log('🔍 Fetching users with filters:', filters); // Debug
-      return userAPI.getAllUsers(filters);
-    },
+    queryFn: () => userAPI.getAllUsers(filters),
   });
-  
-  console.log('📊 Query result:', query); // Debug
-  return query;
-};
 
 export const useUser = (id) => 
   useQuery({
