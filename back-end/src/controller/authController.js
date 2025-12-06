@@ -130,3 +130,96 @@ export const getProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+// Forgot Password
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      throw new AppError('Email is required', 400);
+    }
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new AppError('User not found with this email', 404);
+    }
+
+    // Generate reset token (in production, use crypto for secure tokens)
+    const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    
+    // Set reset token and expiry (24 hours)
+    user.passwordResetToken = resetToken;
+    user.passwordResetExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    await user.save({ validateBeforeSave: false });
+
+    logger.info(`Password reset token generated for user: ${email}`);
+
+    // In production, send email with reset link
+    // For now, return token in response (development only)
+    res.status(200).json({
+      status: 'success',
+      message: 'Password reset token sent to email',
+      // Remove this in production
+      resetToken: resetToken,
+      resetUrl: `${req.protocol}://${req.get('host')}/reset-password?token=${resetToken}`
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Reset Password
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      throw new AppError('Token and new password are required', 400);
+    }
+
+    if (newPassword.length < 8) {
+      throw new AppError('New password must be at least 8 characters', 400);
+    }
+
+    // Find user with valid reset token
+    const user = await User.findOne({
+      passwordResetToken: token,
+      passwordResetExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      throw new AppError('Token is invalid or has expired', 400);
+    }
+
+    // Update password
+    user.password = newPassword;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    // Generate new JWT token
+    const jwtToken = generateToken(user._id);
+
+    logger.info(`Password reset successful for user: ${user.email}`);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Password reset successful',
+      token: jwtToken,
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      },
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};

@@ -56,6 +56,14 @@ const userSchema = new mongoose.Schema({
     state: String,
     zipCode: String,
   },
+  passwordResetToken: {
+    type: String,
+    select: false,
+  },
+  passwordResetExpires: {
+    type: Date,
+    select: false,
+  },
 }, {
   timestamps: true,
 });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { X, Eye, EyeOff, Mail, Lock, Stethoscope, User2, Pill, Shield } from 'lucide-react';
 
 const LoginModal = ({ 
@@ -203,12 +203,13 @@ const LoginModal = ({
                   Ingat saya
                 </label>
               </div>
-              <button
-                type="button"
+              <Link
+                to="/forgot-password"
+                onClick={onClose}
                 className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition duration-200"
               >
                 Lupa password?
-              </button>
+              </Link>
             </div>
 
             {/* Sign In Button dengan Warna yang DIBENARKAN */}

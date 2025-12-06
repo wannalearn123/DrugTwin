@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn } from 'lucide-react';
 
@@ -49,7 +50,7 @@ const LoginPage = () => {
               />
             </div>
             
-            <div className="form-control mb-6">
+            <div className="form-control mb-4">
               <label className="label">
                 <span className="label-text">Password</span>
               </label>
@@ -61,6 +62,15 @@ const LoginPage = () => {
                 required
                 disabled={loading}
               />
+            </div>
+
+            <div className="text-center mb-6">
+              <Link 
+                to="/forgot-password"
+                className="link link-primary text-sm hover:link-hover"
+              >
+                Lupa password?
+              </Link>
             </div>
             
             <button className="btn btn-primary w-full" disabled={loading}>
