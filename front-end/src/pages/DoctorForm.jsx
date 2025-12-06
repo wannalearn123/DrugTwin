@@ -24,9 +24,9 @@ const DoctorForm = () => {
     if (isEdit && data?.data?.doctor) {
       const doc = data.data.doctor;
       setForm({
-        userId: doc.userId?._id || '',
-        name: doc.name,
-        specialization: doc.specialization,
+        userId: doc._id || '',
+        name: doc.userId?.name,
+        specialization: doc.specialties[0] || '',
         licenseNumber: doc.licenseNumber,
         phone: doc.phone || '',
       });

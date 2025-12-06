@@ -7,7 +7,7 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 const PatientDashboard = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const { data, isLoading } = usePatients({ page, limit: 10 });
+  const { data, isLoading } = usePatients({ page, limit: 10, search });
   const removeMut = useRemovePatient();
 
   const handleDelete = (id, name) => {
