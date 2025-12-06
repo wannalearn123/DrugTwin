@@ -23,7 +23,7 @@ export const register = async (req, res, next) => {
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
-    if (!existingUser) {
+    if (existingUser) {
       throw new AppError('Email already registered', 409);
     } 
 
