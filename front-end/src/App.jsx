@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Routes, Route } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -16,29 +15,30 @@ import DoctorDetail from './pages/DoctorDetail';
 import DoctorDashboard from './pages/DoctorDashboard';
 import CheckupForm from './pages/CheckupForm';
 import UserForm from './pages/UserForm';
-import UserManagement from './pages/UserManagement';
-import LandingPage from './pages/LandingPage';
-import AdminPage from './pages/AdminPage';
-=======
-import { Route, Routes } from 'react-router'
-import './App.css'
->>>>>>> cb1138f80c16598bf8c2f417b5823734601c1996
+// import UserManagement from './pages/UserManagement';
 
-import LandingPage from './pages/LandingPage'
-import CreateAccount from './pages/CreateAccount'
-import DoctorPage from './pages/DoctorPage'
-import ApotekerPage from './pages/ApotekerPage'
-import PasienPage from './pages/PasienPage'
+import LandingPage from './pages/LandingPage';
+// import CreateAccount from './pages/CreateAccount'
+// import DoctorPage from './pages/DoctorPage'
+// import ApotekerPage from './pages/ApotekerPage'
+// import PasienPage from './pages/PasienPage'
 import AdminPage from './pages/AdminPage'
-import LoginPage from './pages/LoginPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 
 import toast from 'react-hot-toast'
 
+const qc = new QueryClient({
+  defaultOptions: {
+    queries: {  
+      retry: false,
+      refetchOnWindowFocus: false,
+    }
+  }
+});
+
 const App = () => {
   return (
-<<<<<<< HEAD
     <QueryClientProvider client={qc}>
       <AuthProvider>
         <Routes>
@@ -72,22 +72,6 @@ const App = () => {
       </AuthProvider>
     </QueryClientProvider>
   );
-=======
-    <div data-theme="emerald">
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/create-account" element={<CreateAccount />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/doctor" element={<DoctorPage />} />
-        <Route path="/apoteker" element={<ApotekerPage />} />
-        <Route path="/pasien" element={<PasienPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-      </Routes>
-    </div>
-  )
->>>>>>> cb1138f80c16598bf8c2f417b5823734601c1996
 }
 
 export default App
