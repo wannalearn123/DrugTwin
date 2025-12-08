@@ -16,6 +16,8 @@ import DoctorDashboard from './pages/DoctorDashboard';
 import CheckupForm from './pages/CheckupForm';
 import UserForm from './pages/UserForm';
 import UserManagement from './pages/UserManagement';
+import LandingPage from './pages/LandingPage';
+import AdminPage from './pages/AdminPage';
 
 
 const qc = new QueryClient({ 
@@ -35,8 +37,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           
           {/* Admin Routes */}
-          <Route path="/admin/users" element={<PrivateRoute roles={['admin']}><UserManagement /></PrivateRoute>} />
+          <Route path="/admin" element={<PrivateRoute roles={['admin']}><AdminPage /></PrivateRoute>} />
+          {/* <Route path="/admin/users" element={<PrivateRoute roles={['admin']}><UserManagement /></PrivateRoute>} /> */}
           <Route path="/admin/users/new" element={<PrivateRoute roles={['admin']}><UserForm /></PrivateRoute>} />
+          <Route path="/admin/users/:id/edit" element={<PrivateRoute roles={['admin']}><UserForm /></PrivateRoute>} />
 
           <Route path="/admin/patients" element={<PrivateRoute roles={['admin']}><PatientDashboard /></PrivateRoute>} />
           <Route path="/admin/patients/new" element={<PrivateRoute roles={['admin']}><PatientForm /></PrivateRoute>} />
@@ -53,7 +57,7 @@ function App() {
           <Route path="/doctor/dashboard" element={<PrivateRoute roles={['doctor']}><DoctorDashboard /></PrivateRoute>} />
           <Route path="/doctor/checkup/:patientId" element={<PrivateRoute roles={['doctor']}><CheckupForm /></PrivateRoute>} />
           
-          <Route path="*" element={<LoginPage />} />
+          <Route path="*" element={<LandingPage  />} />
         </Routes>
         <Toaster />
         <ReactQueryDevtools />

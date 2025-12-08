@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
       setTimeout(() => {
         if (u.role === 'admin') {
           console.log('Redirecting to admin...'); // DEBUG
-          nav('/admin/patients', { replace: true });
+          nav('/admin/', { replace: true });
         } else if (u.role === 'doctor') {
           console.log('Redirecting to doctor...'); // DEBUG
           nav('/doctor/dashboard', { replace: true });
