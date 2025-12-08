@@ -1,5 +1,9 @@
 import React from 'react';
+<<<<<<< HEAD
 import { Link } from 'react-router';
+=======
+import { Link } from 'react-router-dom';
+>>>>>>> cb1138f80c16598bf8c2f417b5823734601c1996
 import { ArrowRight } from 'lucide-react';
 
 const LandingPage = () => {

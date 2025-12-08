@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { useNavigate, Link } from 'react-router';
 import { useAuth } from '../context/AuthContext';
+=======
+import { useNavigate, Link } from 'react-router-dom';
+>>>>>>> cb1138f80c16598bf8c2f417b5823734601c1996
 import { X, Eye, EyeOff, Mail, Lock, Stethoscope, User2, Pill, Shield } from 'lucide-react';
 
 const LoginModal = ({ 
@@ -9,9 +13,12 @@ const LoginModal = ({
   onLogin,
   role = 'dokter'
 }) => {
+<<<<<<< HEAD
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
 
+=======
+>>>>>>> cb1138f80c16598bf8c2f417b5823734601c1996
   const navigate = useNavigate();
   
   // Role configuration dengan warna yang DIBENARKAN
@@ -88,11 +95,14 @@ const LoginModal = ({
       return;
     }
 
+<<<<<<< HEAD
     const results = await login(formData.email, formData.password, role);
     if (!results.success) {
       setLoading(false);
     }
 
+=======
+>>>>>>> cb1138f80c16598bf8c2f417b5823734601c1996
     setIsLoading(true);
     
     // Simulate login process
@@ -162,7 +172,11 @@ const LoginModal = ({
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+<<<<<<< HEAD
                   className=" input input-bordered w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
+=======
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
+>>>>>>> cb1138f80c16598bf8c2f417b5823734601c1996
                   placeholder="Masukkan email"
                   required
                 />

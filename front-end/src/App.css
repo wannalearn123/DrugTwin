@@ -1,42 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: #f5f7fa;
+  color: #0f172a;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  font-family: inherit;
+  color: inherit;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  text-align: left;
+}
+
+.bg-patient {
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+.patient-card {
+  background-color: #fff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.patient-card--ai {
+  background: linear-gradient(135deg, #10b981, #14b8a6);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+/* Active Medications */
+.active-med-item {
+  background-color: #d1fae5;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+/* Therapy Schedule */
+.therapy-schedule-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #d1fae5;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  gap: 1rem;
+}
+
+.therapy-schedule-item--pending {
+  background-color: #f1f5f9;
+}
+
+.time-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  min-width: fit-content;
+}
+
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.status-badge--done {
+  background-color: #fff;
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.status-badge--pending {
+  background-color: #fff;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+/* Fast Action Buttons */
+.fast-action-btn {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background-color: #fff;
   text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #1e293b;
+  transition: all 0.2s ease;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.fast-action-btn:hover {
+  border-color: #10b981;
+  background-color: #f0fdf4;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* AI Card Elements */
+.ai-chat-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.ai-chat-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background-color: #fff;
+  color: #10b981;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.card {
-  padding: 2em;
+.ai-chat-btn:hover {
+  background-color: #f0fdf4;
+  transform: translateY(-1px);
 }
 
-.read-the-docs {
-  color: #888;
+.ai-chat-btn-simple {
+  width: 100%;
+  padding: 0.875rem;
+  background-color: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-chat-btn-simple:hover {
+  background-color: #059669;
+}
+
+/* Typography and Text Styling */
+.patient-card h2 {
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.patient-card p {
+  line-height: 1.5;
+}
+
+/* Improve text readability */
+.therapy-schedule-item p,
+.active-med-item p {
+  line-height: 1.4;
+}
+
+.therapy-schedule-item .font-bold {
+  color: #0f172a;
+}
+
+.active-med-item .font-medium {
+  color: #0f172a;
+}
+
+/* Progress Info Box */
+.progress-info-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8fafc;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.progress-info-box .label {
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.progress-info-box .value {
+  color: #10b981;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.progress-day-label {
+  text-align: right;
+  color: #10b981;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
 }
