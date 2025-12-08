@@ -170,6 +170,7 @@ const UserManagementTab = () => {
         <table className="w-full">
           <thead>
             <tr className="border-b border-emerald-100">
+              <th className="text-left py-3 px-4 font-semibold text-emerald-700">_Id</th>
               <th className="text-left py-3 px-4 font-semibold text-emerald-700">User</th>
               <th className="text-left py-3 px-4 font-semibold text-emerald-700">Role</th>
               <th className="text-left py-3 px-4 font-semibold text-emerald-700">Status</th>
@@ -179,6 +180,9 @@ const UserManagementTab = () => {
           <tbody>
             {users.map((user) => (
               <tr key={user._id} className="border-b border-emerald-50 hover:bg-emerald-25">
+                <td className="py-3 px-4">
+                  <h3 className="text-sm text-gray-600">{user._id}</h3>
+                </td>
                 <td className="py-3 px-4">
                   <div>
                     <p className="font-medium text-gray-900">{user.name}</p>

@@ -26,7 +26,7 @@ const DoctorForm = () => {
       setForm({
         userId: doc._id || '',
         name: doc.userId?.name,
-        specialization: doc.specialties[0] || '',
+        specialization: doc.specialties.join(', ') || '',
         licenseNumber: doc.licenseNumber,
         phone: doc.phone || '',
       });
