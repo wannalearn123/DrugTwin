@@ -47,7 +47,7 @@ export const getMyPatients = async (req, res, next) => {
 // Get patient details with checkup history
 export const getPatientDetails = async (req, res, next) => {
   try {
-    const patient = await Patient.findById(req.params.patientId)
+    const patient = await Patient.findById(req.params.id)
       .populate('userId', 'name email')
       .populate('assignedDoctorId', 'name');
 
@@ -56,7 +56,7 @@ export const getPatientDetails = async (req, res, next) => {
     }
 
     // Get checkup history
-    const checkups = await Checkup.find({ patientId: req.params.patientId })
+    const checkups = await Checkup.find({ patientId: req.params.id })
       .populate('doctorId', 'name')
       .sort({ createdAt: -1 })
       .limit(10);

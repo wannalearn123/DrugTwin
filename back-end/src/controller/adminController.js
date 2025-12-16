@@ -167,10 +167,10 @@ export const deletePatient = async (req, res, next) => {
 // Create Doctor
 export const createDoctor = async (req, res, next) => {
   try {
-    const { userId, name, specialization, licenseNumber, phone } = req.body;
+    const { userId,  specialization, licenseNumber, phone } = req.body;
 
     // Validate required fields
-    if (!userId || !name || !specialization || !licenseNumber) {
+    if (!userId  || !specialization || !licenseNumber) {
       throw new AppError('Please provide all required fields', 400);
     }
 
