@@ -14,9 +14,9 @@ router.use(protect);
 router.use(restrictTo('doctor'));
 
 // Doctor routes
-router.get('/my-patients', getMyPatients);
-router.get('/patients/:patientId', getPatientDetails);
+router.get('/patients', getMyPatients);
+router.get('/patients/:id', getPatientDetails);
 router.post('/checkup', createCheckup);
-router.get('/checkups/:patientId', getCheckupHistory);
+router.get('/checkup/:id', getCheckupHistory);
 
 export default router;
