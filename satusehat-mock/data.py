@@ -117,6 +117,34 @@ PATIENTS = [
         "birthDate": "1998-02-02",
         "address": [{"city": "Bandung"}],
     },
+    # Negative fixture for TB intake: diabetes, not TB.
+    {
+        "resourceType": "Patient",
+        "id": "PAT-1000000000003",
+        "identifier": [
+            {"system": "https://fhir.kemkes.go.id/id/nik", "value": "3273030303030003"},
+            {"system": "http://sys-ids.kemkes.go.id/patient/", "value": "1000000000003"},
+        ],
+        "active": True,
+        "name": [{"text": "Dewi Lestari"}],
+        "gender": "female",
+        "birthDate": "1975-03-03",
+        "address": [{"city": "Bandung"}],
+    },
+    # True negative: no recorded Condition at all.
+    {
+        "resourceType": "Patient",
+        "id": "PAT-1000000000004",
+        "identifier": [
+            {"system": "https://fhir.kemkes.go.id/id/nik", "value": "3273040404040004"},
+            {"system": "http://sys-ids.kemkes.go.id/patient/", "value": "1000000000004"},
+        ],
+        "active": True,
+        "name": [{"text": "Joko Widodo"}],
+        "gender": "male",
+        "birthDate": "1988-04-04",
+        "address": [{"city": "Bandung"}],
+    },
 ]
 
 PATIENT_BY_ID = {p["id"]: p for p in PATIENTS}
@@ -140,7 +168,7 @@ def _medication_req_id(patient_id, phase, idx):
     return f"MR-{patient_id[-4:]}-{phase}-{idx}"
 
 
-def _make_tb_regimen(patient_id):
+def _make_regimen(patient_id, condition_code, condition_display, care_plan_title, phase_drugs, recorded_date):
     encounter = {
         "resourceType": "Encounter",
         "id": f"ENC-{patient_id[-4:]}-1",
@@ -152,23 +180,23 @@ def _make_tb_regimen(patient_id):
     condition = {
         "resourceType": "Condition",
         "id": f"COND-{patient_id[-4:]}-1",
-        "code": {"coding": [{"system": "http://hl7.org/fhir/sid/icd-10", "code": "A15.0", "display": "Pulmonary tuberculosis"}]},
+        "code": {"coding": [{"system": "http://hl7.org/fhir/sid/icd-10", "code": condition_code, "display": condition_display}]},
         "clinicalStatus": {"coding": [{"code": "active"}]},
         "subject": {"reference": f"Patient/{patient_id}"},
-        "recordedDate": "2024-01-10T08:00:00+07:00",
+        "recordedDate": recorded_date,
     }
     care_plan = {
         "resourceType": "CarePlan",
         "id": f"CP-{patient_id[-4:]}-1",
         "status": "active",
         "intent": "plan",
-        "title": "TBC regimen - 2HRZE + 4HR",
+        "title": care_plan_title,
         "subject": {"reference": f"Patient/{patient_id}"},
         "period": {"start": "2024-02-01", "end": "2024-08-01"},
     }
 
     requests = []
-    for phase, drugs, days in (("intensive", TB_INTENSIVE_DRUGS, 56), ("cont", TB_CONT_DRUGS, 56)):
+    for phase, drugs, days in phase_drugs:
         for idx, (name, dose, _) in enumerate(drugs):
             requests.append({
                 "resourceType": "MedicationRequest",
@@ -198,14 +226,55 @@ def _make_tb_regimen(patient_id):
             "drugName": name,
             "phase": phase,
         }
-        for phase, drugs, days in (("intensive", TB_INTENSIVE_DRUGS, 56), ("cont", TB_CONT_DRUGS, 56))
+        for phase, drugs, days in phase_drugs
         for idx, (name, dose, _) in enumerate(drugs)
     ]
 
     return [encounter, condition, care_plan, *requests, *dispenses]
 
 
-REGIMEN_BY_PATIENT = {p["id"]: _make_tb_regimen(p["id"]) for p in PATIENTS}
+def _make_tb_regimen(patient_id):
+    return _make_regimen(
+        patient_id,
+        condition_code="A15.0",
+        condition_display="Pulmonary tuberculosis",
+        care_plan_title="TBC regimen - 2HRZE + 4HR",
+        phase_drugs=(("intensive", TB_INTENSIVE_DRUGS, 56), ("cont", TB_CONT_DRUGS, 56)),
+        recorded_date="2024-01-10T08:00:00+07:00",
+    )
+
+
+def _make_diabetes_regimen(patient_id):
+    return _make_regimen(
+        patient_id,
+        condition_code="E11.9",
+        condition_display="Type 2 diabetes mellitus",
+        care_plan_title="Diabetes regimen - metformin",
+        phase_drugs=(("maintenance", [("Metformin", "500mg", 2)], 180),),
+        recorded_date="2024-03-05T09:00:00+07:00",
+    )
+
+
+def _make_no_condition(patient_id):
+    """Patient with an Encounter but no Condition - the true negative for TB intake."""
+    return [
+        {
+            "resourceType": "Encounter",
+            "id": f"ENC-{patient_id[-4:]}-1",
+            "status": "finished",
+            "class": {"code": "IMP", "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode"},
+            "subject": {"reference": f"Patient/{patient_id}"},
+            "type": [{"coding": [{"code": "inpatient"}]}],
+        }
+    ]
+
+
+REGIMEN_BY_PATIENT = {
+    "PAT-1000000000001": _make_tb_regimen("PAT-1000000000001"),
+    "PAT-1000000000002": _make_tb_regimen("PAT-1000000000002"),
+    "PAT-1000000000003": _make_diabetes_regimen("PAT-1000000000003"),
+    "PAT-1000000000004": _make_no_condition("PAT-1000000000004"),
+}
 
 
 def all_resources():
