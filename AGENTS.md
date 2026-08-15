@@ -1,40 +1,49 @@
 # AGENTS.md
 
-Healthcare platform (AI-assisted doctor/pharmacist/patient decision support). Two independent Node packages: `back-end/` (Express REST API) and `front-end/` (React + Vite). Each has its own `package.json`; there is no root workspace manager, so always run commands in the relevant package dir.
+Drug Twin: healthcare integration (doctor/pharmacist/patient) + AI decision support, backed by the Indonesian SATUSEHAT FHIR R4 platform.
 
-## Commands
+## Repo layout (two Python services)
 
-Back-end (`cd back-end`)
-- `npm run dev` — nodemon on `src/app.js` (entrypoint)
-- `npm start` — plain node
-- No tests, lint, or typecheck configured. ESM (`"type": "module"`); use `import`/`export`.
+- `back-end/` — FastAPI monolith. Entry: `back-end/main.py` (`create_app()` factory, module-level `app = create_app()`). `app/core/satusehat_client.py` is the **only** external FHIR integration seam.
+- `satusehat-mock/` — local stand-in for SATUSEHAT (OAuth2 client_credentials + FHIR R4 reads). `main.py` + seeded `data.py`.
+- `legacy-ai-slop` git branch — old codebase, do not touch. Work on `development`.
 
-Front-end (`cd front-end`)
-- `npm run dev` — Vite dev server (default port 5173)
-- `npm run build`, `npm run preview`
-- `npm run lint` — ESLint. Run before finishing changes.
-- No tests configured.
+## Shared venv — the big gotcha
 
-## Start-up prerequisites
+One venv lives at the **repo root as `venv/`, not `.venv/`**. All commands must use it:
 
-`docker-compose.yml` (in `back-end/`) runs MongoDB 7 (:27017), Redis 7 (:6379), rabbitmq 3.12 (:5672/:15672). Start with `docker compose up -d` before the API, or the API runs with no DB (see quirk below).
+```bash
+# Mock (must be up before backend/verify work)
+venv/bin/uvicorn main:app --port 8100 --app-dir satusehat-mock
+# Backend
+venv/bin/uvicorn main:app --port 8000 --app-dir back-end
+# Client integration check (mock must be running; run from repo root)
+venv/bin/python back-end/scripts/verify_client.py
+```
 
-Both packages load their own gitignored `.env`:
-- `back-end/.env` keys: `NODE_ENV`, `PORT`, `MONGO_URI`, `REDIS_HOST`, `REDIS_PORT`, `RABBITMQ_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `BCRYPT_ROUNDS`.
-- `front-end/.env`: `VITE_API_URL` (must point at the API, e.g. `http://localhost:5000`).
-- `httpClient.js` reads `import.meta.env.VITE_API_URL` and attaches `Authorization: Bearer <authToken>` from `localStorage`; clears storage + redirects to `/login` on 401.
+Deps live in the shared venv (`fastapi`, `uvicorn[standard]`, `httpx`). To install new deps use `venv/bin/pip install ...` from the root — never create a separate `.venv`. Renaming/relocating the venv breaks the launcher shebangs in `venv/bin/`; if that happens, reinstall the packages into the existing `venv/` rather than recreating it.
 
-## Architecture / structure
+## Running a server from the wrong dir
 
-- Back-end is layered by folder: `routes/` (thin) → `controller/` → `model/` (Mongoose), plus `middleware/` and `config/`.
-- Entrypoint `src/app.js` mounts routes at `/api/auth`, `/api/admin`, `/api/doctor`, `/api/ai` and a `/health` probe. `userRoutes.js` (imports from `middleware/auth.js`) is NOT mounted — don't add routes there expecting them to be reachable unless you also mount it.
-- Auth/authorization: `authWare.js` provides `protect` + `restrictTo(['role', ...])`, applied per-route or via `router.use(...)`. `RBACWare.js` is a separate scope-based system (`checkPermission`, `verifyTokenScopes`) that queries a scoped JWT — currently only imported by code/tests, not wired into mounted routes. Roles are `admin`, `doctor`, `pharmacist`, `patient`.
-- AI is a rule-based generator, not an LLM. `controller/aiController.js` (`generateSuggestions`) emits drugs/lifestyle/warnings from diagnosis text + vitals + allergies, mapping allergies to alternatives. Extend it by adding rule blocks there.
-- Front-end: `src/api/*` are axios wrappers over REST; `src/hooks/use*.js` wrap them with TanStack Query; pages in `src/pages/`, shared UI + modals in `src/components/`. Tailwind + daisyui styling.
-- API reference: `postman.json` (collection) and `postman/` export folder.
+`--app-dir` lets you launch both apps from the root with the shared venv (see above). Backend CORS only allows `http://localhost:5173/5174` (Vite dev), so a backend edit affecting CORS needs those ports.
 
-## Gotchas
+## FHIR id vs identifier (easy to get wrong)
 
-- `config/db.js` intentionally does NOT exit if MongoDB is unreachable (good for API testing), and if `MONGO_URI` is absent it logs "running in memory mode". Don't treat a live server as proof the DB is connected.
-- CORS in `app.js` only allows origins `http://localhost:5173/5174/5175`. If the front-end runs on another port, add it to the array or requests will be blocked.
-- `.env` files exist locally but are gitignored; keep secrets out of commits.
+In the mock and real SATUSEHAT, a Patient's resource `id` (`PAT-…`) is **distinct** from its searchable `identifier` values (NIK / SATUSEHAT IHS number). Lookup by resource id → `get_patient(id)` (`GET /Patient/{id}`). Lookup by identity → `find_patient(NIK)` (`GET /Patient?identifier=`). They are not interchangeable — a resource id will not match `?identifier=`.
+
+## SATUSEHAT "only TB" reality
+
+SATUSEHAT cannot list "all TB patients". There is no `?condition=` search on `Patient`. Always: resolve patient by identity → fetch `Patient/{id}/Condition` → confirm an active TB `A15.x` condition. The Phase 2 intake guard lives in the app, not the mock.
+
+## Mock details
+
+- Token: `POST /oauth2/v1/accesstoken?grant_type=client_credentials` with form body `client_id=drugtwin_mock_client` & `client_secret=drugtwin_mock_secret`. All FHIR endpoints require `Authorization: Bearer mock-bearer-token`.
+- Seeded patients (in `satusehat-mock/data.py`): `PAT-…001` Budi & `…002` Siti = TB (`A15.0`); `…003` Dewi = diabetes (`E11.9`); `…004` Joko = no Condition. These are the TB-intake fixtures (accept 001/002, reject 003/004).
+
+## Config
+
+`back-end/app/core/config.py` reads env vars with dev defaults (no `.env` needed). Overrides: `SATUSEHAT_BASE_URL` (mock `localhost:8100` vs prod), `SATUSEHAT_CLIENT_ID/SECRET`, `DATABASE_URL` (Postgres, unused until Phase 1), `JWT_SECRET`, `API_PORT`, `ENV`.
+
+## Tests / lint
+
+No test framework or lint/typecheck configured yet. The only automated check is `back-end/scripts/verify_client.py` (requires mock up). Phase 1 adds Postgres, SQLAlchemy/Alembic, and local JWT — database deps are still commented out in `back-end/requirements.txt`.
