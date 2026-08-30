@@ -9,13 +9,13 @@ load_dotenv()
 router = APIRouter(prefix="/oauth2", tags=["OAuth2"])
 
 MOCK_CLIENT_ID = os.getenv("MOCK_CLIENT_ID")
-MOCK_CLIENT_SECRET = os.getenv("MOCK_CLIENT_SECRET") 
-EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")) 
+MOCK_CLIENT_SECRET = os.getenv("MOCK_CLIENT_SECRET")
+EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
 class TokenResponse(BaseModel):
     access_token: str
-    token_type: str = "bearer"
+    token_type: str = "Bearer"
     expires_in: int
 
 

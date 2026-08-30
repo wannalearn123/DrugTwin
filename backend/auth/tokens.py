@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 from jose import jwt, JWTError
 
 load_dotenv()
@@ -13,26 +13,26 @@ EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
 def create_access_token(data: dict) -> str:
+    current = timezone.utc
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + (timedelta(minutes=EXPIRE_MINUTES))
+    expire = datetime.now(current) + timedelta(minutes=EXPIRE_MINUTES)
     to_encode.update({
         "exp": expire,
-        "iat": datetime.now(timezone.utc),
+        "iat": datetime.now(current),
         "iss": JWT_ISSUER,
         "aud": JWT_AUDIENCE,
     })
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def verify_token(token: str) -> bool:
+def verify_token(token: str) -> dict | None:
     try:
-        jwt.decode(
+        return jwt.decode(
             token,
             JWT_SECRET,
             algorithms=[JWT_ALGORITHM],
             audience=JWT_AUDIENCE,
             issuer=JWT_ISSUER,
         )
-        return True
     except JWTError:
-        return False
+        return None

@@ -36,7 +36,6 @@ async def root():
     return {"message": APP_NAME, "docs": "/docs"}
 
 
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host=HOST, port=PORT, reload=DEBUG)

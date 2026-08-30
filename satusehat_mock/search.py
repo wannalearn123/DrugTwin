@@ -12,7 +12,8 @@ async def search_patient(
 ):
     patients = list(STORE["Patient"].values())
     if identifier:
-        patients = [p for p in patients if any(i.get("value") == identifier for i in p.get("identifier", []))]
+        patients = [p for p in patients if any(
+            i.get("value") == identifier for i in p.get("identifier", []))]
     return make_bundle(patients)
 
 
@@ -25,15 +26,18 @@ async def search_encounter(
 ):
     encounters = list(STORE["Encounter"].values())
     if patient:
-        encounters = [e for e in encounters if patient in e.get("subject", {}).get("reference", "")]
+        encounters = [e for e in encounters if patient in e.get(
+            "subject", {}).get("reference", "")]
     if status:
         encounters = [e for e in encounters if e.get("status") == status]
     if _lastUpdated:
         if _lastUpdated.startswith("gt"):
             ts = _lastUpdated[2:]
-            encounters = [e for e in encounters if e.get("meta", {}).get("lastUpdated", "") > ts]
+            encounters = [e for e in encounters if e.get(
+                "meta", {}).get("lastUpdated", "") > ts]
         else:
-            encounters = [e for e in encounters if e.get("meta", {}).get("lastUpdated", "") == _lastUpdated]
+            encounters = [e for e in encounters if e.get(
+                "meta", {}).get("lastUpdated", "") == _lastUpdated]
     return make_bundle(encounters)
 
 
@@ -45,9 +49,11 @@ async def search_condition(
 ):
     conditions = list(STORE["Condition"].values())
     if encounter:
-        conditions = [c for c in conditions if encounter in c.get("encounter", {}).get("reference", "")]
+        conditions = [c for c in conditions if encounter in c.get(
+            "encounter", {}).get("reference", "")]
     if subject:
-        conditions = [c for c in conditions if subject in c.get("subject", {}).get("reference", "")]
+        conditions = [c for c in conditions if subject in c.get(
+            "subject", {}).get("reference", "")]
     return make_bundle(conditions)
 
 
@@ -59,9 +65,11 @@ async def search_medication_request(
 ):
     reqs = list(STORE["MedicationRequest"].values())
     if encounter:
-        reqs = [r for r in reqs if encounter in r.get("encounter", {}).get("reference", "")]
+        reqs = [r for r in reqs if encounter in r.get(
+            "encounter", {}).get("reference", "")]
     if subject:
-        reqs = [r for r in reqs if subject in r.get("subject", {}).get("reference", "")]
+        reqs = [r for r in reqs if subject in r.get(
+            "subject", {}).get("reference", "")]
     return make_bundle(reqs)
 
 
@@ -73,9 +81,11 @@ async def search_medication_dispense(
 ):
     dispenses = list(STORE["MedicationDispense"].values())
     if subject:
-        dispenses = [d for d in dispenses if subject in d.get("subject", {}).get("reference", "")]
+        dispenses = [d for d in dispenses if subject in d.get(
+            "subject", {}).get("reference", "")]
     if prescription:
-        dispenses = [d for d in dispenses if any(prescription in r.get("reference", "") for r in d.get("authorizingPrescription", []))]
+        dispenses = [d for d in dispenses if any(prescription in r.get(
+            "reference", "") for r in d.get("authorizingPrescription", []))]
     return make_bundle(dispenses)
 
 
@@ -86,7 +96,8 @@ async def search_appointment(
 ):
     appts = list(STORE["Appointment"].values())
     if patient:
-        appts = [a for a in appts if any(patient in p.get("actor", {}).get("reference", "") for p in a.get("participant", []))]
+        appts = [a for a in appts if any(patient in p.get("actor", {}).get(
+            "reference", "") for p in a.get("participant", []))]
     return make_bundle(appts)
 
 
@@ -97,7 +108,9 @@ async def search_practitioner(
 ):
     practitioners = list(STORE["Practitioner"].values())
     if identifier:
-        practitioners = [p for p in practitioners if any(i.get("value") == identifier for i in p.get("identifier", []))]
+        practitioners = [
+            p for p in practitioners if any(i.get("value") == identifier for i in p.get("identifier", []))
+        ]
     return make_bundle(practitioners)
 
 
@@ -108,5 +121,6 @@ async def search_organization(
 ):
     orgs = list(STORE["Organization"].values())
     if identifier:
-        orgs = [o for o in orgs if any(i.get("value") == identifier for i in o.get("identifier", []))]
+        orgs = [o for o in orgs if any(
+            i.get("value") == identifier for i in o.get("identifier", []))]
     return make_bundle(orgs)
